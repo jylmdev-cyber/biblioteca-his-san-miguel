@@ -64,7 +64,7 @@ El sistema centraliza y facilita la consulta de los manuales oficiales de codifi
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone https://github.com/TU-USUARIO/biblioteca-his-san-miguel.git
+   git clone https://github.com/jylmdev-cyber/biblioteca-his-san-miguel.git
    cd biblioteca-his-san-miguel
    ```
 
@@ -106,38 +106,30 @@ El proyecto está 100% preconfigurado para publicarse automáticamente en **GitH
 
 2. **Subir los archivos:**
    ```bash
-   git init
    git add .
-   git commit -m "feat: lanzamiento biblioteca his ris san miguel"
-   git branch -M main
-   git remote add origin https://github.com/TU-USUARIO/biblioteca-his-san-miguel.git
+   git commit -m "feat: configuracion de produccion para GitHub Pages"
    git push -u origin main
    ```
 
 3. **Habilitar GitHub Pages en el repositorio:**
-   - Ve a **Settings** en la barra superior de tu repositorio.
-   - En la barra lateral izquierda, haz clic en **Pages**.
+   - Ve a **Settings** en la barra superior de tu repositorio (`https://github.com/jylmdev-cyber/biblioteca-his-san-miguel/settings/pages`).
    - En la sección **Build and deployment > Source**, selecciona:
      👉 **`GitHub Actions`** (en lugar de "Deploy from a branch").
 
 4. **Despliegue automático:**
    - Cada vez que hagas `git push` a la rama `main`, se disparará automáticamente el flujo de trabajo configurado en `.github/workflows/deploy.yml`.
-   - El workflow:
-     1. Valida TypeScript y la integridad de las colecciones.
-     2. Ejecuta auditorías de contraste de color y temas.
-     3. Sincroniza los PDFs oficiales disponibles.
-     4. Calcula automáticamente la ruta base (`/` para repositorios de usuario o `/<repo-name>/` para proyectos).
-     5. Compila y publica el sitio en `https://TU-USUARIO.github.io/biblioteca-his-san-miguel/`.
+   - El workflow compila y publica el sitio en:
+     👉 **`https://jylmdev-cyber.github.io/biblioteca-his-san-miguel/`**
 
 ### Despliegue Manual con Variables de Entorno (Opcional)
 
-Si necesitas compilar localmente para un subdominio o ruta específica:
+Si necesitas compilar localmente para la ruta oficial:
 ```bash
 # En entornos Linux / macOS:
-PUBLIC_SITE_URL=https://tu-usuario.github.io PUBLIC_BASE_PATH=/biblioteca-his-san-miguel/ npm run build
+PUBLIC_SITE_URL=https://jylmdev-cyber.github.io PUBLIC_BASE_PATH=/biblioteca-his-san-miguel/ npm run build
 
 # En PowerShell (Windows):
-$env:PUBLIC_SITE_URL="https://tu-usuario.github.io"
+$env:PUBLIC_SITE_URL="https://jylmdev-cyber.github.io"
 $env:PUBLIC_BASE_PATH="/biblioteca-his-san-miguel/"
 npm run build
 ```

@@ -11,8 +11,8 @@ import tailwindcss from '@tailwindcss/vite';
  * 
  * Si compilas localmente sin variables, se asume '/' por defecto.
  */
-const site = process.env.PUBLIC_SITE_URL || 'https://ris-san-miguel.github.io';
-const base = process.env.PUBLIC_BASE_PATH || '/';
+const site = process.env.PUBLIC_SITE_URL || 'https://jylmdev-cyber.github.io';
+const base = process.env.PUBLIC_BASE_PATH || '/biblioteca-his-san-miguel/';
 
 export default defineConfig({
   site,
