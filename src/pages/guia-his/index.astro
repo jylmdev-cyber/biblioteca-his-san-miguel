@@ -1,0 +1,113 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { urlFor } from '@/lib/urls';
+import {
+  Compass,
+  BookOpen,
+  ArrowRight,
+  AlertCircle,
+  HelpCircle,
+  FileCheck2
+} from 'lucide-react';
+
+const steps = [
+  { n: '01', title: 'Datos de la atención', text: 'Consigna fecha, documento, historia clínica, edad, sexo, financiador y los otros datos generales según la Guía HIS y las condiciones del registro.' },
+  { n: '02', title: 'Condición del paciente', text: 'Identifica las condiciones respecto al establecimiento y servicio cuando el tipo de atención lo requiera. No las confundas con el tipo de diagnóstico.' },
+  { n: '03', title: 'Código del diagnóstico o actividad', text: 'Selecciona CIE-10 para diagnósticos y CPMS para procedimientos/actividades conforme al manual del programa y a la atención realmente realizada.' },
+  { n: '04', title: 'Tipo de diagnóstico P / D / R', text: 'P: presuntivo; D: definitivo; R: repetido o seguimiento, según las instrucciones y excepciones del manual aplicable.' },
+  { n: '05', title: 'Casilleros LAB 1, 2 y 3', text: 'Revisa el valor y la posición en el ejemplo del procedimiento. LAB puede indicar secuencias, condiciones, resultados o modalidades de atención.' },
+  { n: '06', title: 'Control de calidad antes del envío', text: 'Compara lo digitado con la hoja HIS y la documentación fuente. Verifica coherencia de códigos, duplicados, fechas y observaciones pendientes.' },
+];
+---
+<SiteLayout title="Guía rápida de llenado de hoja HIS">
+  <section class="border-b border-border bg-card/70">
+    <div class="container-site py-12">
+      <span class="eyebrow flex items-center gap-1.5">
+        <Compass className="size-3.5 text-primary" aria-hidden="true" />
+        <span>Referencia transversal</span>
+      </span>
+      <h1 class="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Guía rápida de registro HIS</h1>
+      <p class="mt-4 max-w-3xl text-sm leading-7 text-muted-foreground">
+        Resumen operativo para personal asistencial y digitadores. Los criterios específicos de cada programa prevalecen sobre esta síntesis; consulta siempre el manual oficial pertinente.
+      </p>
+    </div>
+  </section>
+
+  <section class="container-site grid gap-8 py-12 lg:grid-cols-[1fr_300px]">
+    <div>
+      <div class="grid gap-4">
+        {steps.map(s => (
+          <article class="flex gap-4 rounded-2xl border border-border bg-card p-5 sm:p-6">
+            <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-accent font-mono text-lg font-extrabold text-primary">
+              {s.n}
+            </span>
+            <div>
+              <h2 class="text-lg font-extrabold">{s.title}</h2>
+              <p class="mt-2 text-sm leading-7 text-muted-foreground">{s.text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="mt-10 rounded-2xl border border-border bg-card p-6">
+        <div class="flex items-center gap-2">
+          <FileCheck2 className="size-5 text-primary shrink-0" aria-hidden="true" />
+          <h2 class="text-xl font-extrabold">Diferencia entre P, D y R</h2>
+        </div>
+        <div class="mt-5 grid gap-3 sm:grid-cols-3">
+          {[
+            { v: 'P', t: 'Presuntivo', d: 'Diagnóstico provisional sin certeza clínica o pendiente de resultado' },
+            { v: 'D', t: 'Definitivo', d: 'Diagnóstico confirmado o procedimiento cuando así lo exige el manual' },
+            { v: 'R', t: 'Repetido', d: 'Seguimiento posterior al diagnóstico definitivo del mismo episodio' }
+          ].map(o => (
+            <div class="rounded-xl bg-muted p-4">
+              <span class="grid size-9 place-items-center rounded-lg bg-primary text-lg font-extrabold text-primary-foreground">
+                {o.v}
+              </span>
+              <div class="mt-3 text-sm font-bold">{o.t}</div>
+              <p class="mt-1 text-xs leading-5 text-muted-foreground">{o.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <aside class="space-y-4 lg:sticky lg:top-28 lg:self-start">
+      <div class="rounded-2xl border border-border bg-card p-5">
+        <h2 class="text-base font-extrabold flex items-center gap-2">
+          <HelpCircle className="size-4 text-primary shrink-0" aria-hidden="true" />
+          <span>No confundir</span>
+        </h2>
+        <dl class="mt-4 space-y-3 text-sm">
+          <div>
+            <dt class="font-bold">CIE-10 / CPMS</dt>
+            <dd class="mt-1 text-muted-foreground">Código del diagnóstico o del procedimiento.</dd>
+          </div>
+          <div>
+            <dt class="font-bold">P / D / R</dt>
+            <dd class="mt-1 text-muted-foreground">Tipo del diagnóstico o actividad según regla específica.</dd>
+          </div>
+          <div>
+            <dt class="font-bold">LAB</dt>
+            <dd class="mt-1 text-muted-foreground">Valor auxiliar condicionado por el procedimiento.</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="rounded-2xl bg-accent p-5">
+        <h2 class="text-base font-extrabold flex items-center gap-2">
+          <AlertCircle className="size-4 text-primary shrink-0" aria-hidden="true" />
+          <span>Consulta el manual exacto</span>
+        </h2>
+        <p class="mt-2 text-xs leading-6 text-muted-foreground">
+          Una misma sigla o número LAB puede significar cosas distintas en otras actividades.
+        </p>
+        <a href={urlFor('manuales/')} class="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-primary underline">
+          <BookOpen className="size-4 shrink-0" aria-hidden="true" />
+          <span>Buscar manuales</span>
+          <ArrowRight className="size-3.5" aria-hidden="true" />
+        </a>
+      </div>
+    </aside>
+  </section>
+</SiteLayout>

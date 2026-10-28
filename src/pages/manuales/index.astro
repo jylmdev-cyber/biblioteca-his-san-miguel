@@ -1,0 +1,25 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import CatalogExplorer from '@/components/islands/CatalogExplorer';
+import { getCollection } from 'astro:content';
+import { urlFor } from '@/lib/urls';
+const entries=await getCollection('manuales');
+const manuals=entries.map(m=>({slug:m.id,title:m.data.title,shortTitle:m.data.shortTitle,description:m.data.description,year:m.data.year,category:m.data.category,program:m.data.program,course:m.data.course,type:m.data.type,status:m.data.status,codes:m.data.codes,keywords:m.data.keywords,featured:m.data.featured}));
+---
+<SiteLayout title="Catálogo de manuales HIS" description="Consulta y filtra los manuales HIS MINSA por estrategia, curso de vida, año y códigos de atención.">
+  <section class="border-b border-border bg-card/60">
+    <div class="container-site py-10 sm:py-14">
+      <div class="eyebrow">Biblioteca documental</div>
+      <h1 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
+        Catálogo de manuales&nbsp;HIS
+      </h1>
+      <p class="mt-4 max-w-3xl text-[14px] leading-7 text-muted-foreground sm:text-[15px] sm:leading-8">
+        Filtra por estrategia, curso de vida, edición o tipo de documento. Consulta manuales actuales y ediciones históricas desde 2019.
+        Los PDF oficiales se ofrecen en visor local cuando la copia está disponible; también conservan el enlace de la BVS.
+      </p>
+    </div>
+  </section>
+  <section class="container-site py-8 sm:py-12">
+    <CatalogExplorer client:load manuals={manuals} base={urlFor('')}/>
+  </section>
+</SiteLayout>

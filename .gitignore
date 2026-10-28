@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.local
+.DS_Store
+*.log
+
+# PDF de consulta descargados durante npm run sync:pdf.
+/public/pdfs/*.pdf
+!/public/pdfs/tuberculosis.pdf

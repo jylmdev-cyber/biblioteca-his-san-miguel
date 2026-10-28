@@ -1,0 +1,129 @@
+---
+import { urlFor } from '@/lib/urls';
+import {
+  FileText,
+  ExternalLink,
+  Download,
+  CheckCircle2,
+  AlertCircle,
+  FileSearch,
+  Eye
+} from 'lucide-react';
+
+interface Props {
+  shortTitle: string;
+  pdf: string;
+  slug: string;
+  localAvailable: boolean;
+}
+
+const { shortTitle, pdf, slug, localAvailable } = Astro.props;
+const localUrl = urlFor(`pdfs/${slug}.pdf`);
+---
+<section id="pdf" class="scroll-mt-28 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div class="min-w-0 flex-1">
+      <div class="eyebrow flex items-center gap-1.5">
+        <FileText className="size-3.5 text-primary shrink-0" aria-hidden="true" />
+        <span>Documento oficial MINSA</span>
+      </div>
+      <h2 class="mt-1 text-xl font-extrabold tracking-tight sm:text-2xl">Leer el manual completo</h2>
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+        {localAvailable ? 'Copia del PDF oficial alojada en este sitio para evitar bloqueos de visualización de servidores externos.' : 'La ficha conserva el enlace oficial. Todavía no se ha incorporado una copia local para el visor.'}
+      </p>
+    </div>
+    <span class:list={[
+      'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold',
+      localAvailable ? 'border-success/30 bg-success/10 text-success' : 'border-warning/30 bg-warning/10 text-warning'
+    ]}>
+      {localAvailable ? (
+        <>
+          <CheckCircle2 className="size-3.5 shrink-0" aria-hidden="true" />
+          <span>PDF listo para lectura</span>
+        </>
+      ) : (
+        <>
+          <AlertCircle className="size-3.5 shrink-0" aria-hidden="true" />
+          <span>Copia local no disponible</span>
+        </>
+      )}
+    </span>
+  </div>
+
+  <div class="mt-5 flex flex-wrap gap-2.5">
+    {localAvailable && (
+      <a
+        href={localUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="ui-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
+      >
+        <Eye className="size-4 shrink-0" aria-hidden="true" />
+        <span>Abrir visor completo</span>
+        <ExternalLink className="size-3.5 shrink-0 opacity-80" aria-hidden="true" />
+      </a>
+    )}
+    {localAvailable && (
+      <a
+        href={localUrl}
+        download={`${slug}.pdf`}
+        class="ui-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-muted"
+      >
+        <Download className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <span>Descargar PDF</span>
+      </a>
+    )}
+    <a
+      href={pdf}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="ui-action inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold hover:bg-muted"
+    >
+      <FileText className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      <span>Documento original en BVS</span>
+      <ExternalLink className="size-3.5 shrink-0 opacity-70" aria-hidden="true" />
+    </a>
+  </div>
+
+  {localAvailable ? (
+    <details class="group mt-5 overflow-hidden rounded-xl border border-border bg-background" open>
+      <summary class="flex min-h-12 cursor-pointer select-none items-center justify-between gap-2 bg-secondary/70 px-4 py-3 text-sm font-bold text-secondary-foreground hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-ring">
+        <span class="flex items-center gap-2">
+          <FileText className="size-4 text-primary shrink-0" aria-hidden="true" />
+          <span>Vista previa del documento · {shortTitle}</span>
+        </span>
+        <span class="transition-transform duration-200 group-open:rotate-180" aria-hidden="true">⌄</span>
+      </summary>
+      <div class="relative border-t border-border bg-muted/50 p-2 sm:p-3">
+        <object
+          type="application/pdf"
+          data={`${localUrl}#toolbar=1&navpanes=0&view=FitH`}
+          aria-label={`Documento PDF de ${shortTitle}`}
+          class="block h-[60vh] min-h-[420px] w-full rounded-lg bg-card sm:h-[75vh] sm:min-h-[650px]"
+        >
+          <div class="flex min-h-72 flex-col items-center justify-center p-8 text-center text-sm text-muted-foreground">
+            <FileSearch className="size-10 mb-2 opacity-50" aria-hidden="true" />
+            <p>Tu navegador no puede mostrar PDF dentro de la página.</p>
+            <a href={localUrl} target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center gap-1 font-bold text-primary underline">
+              <span>Abrir documento en otra pestaña</span>
+              <ExternalLink className="size-3.5" aria-hidden="true" />
+            </a>
+          </div>
+        </object>
+      </div>
+      <p class="border-t border-border px-4 py-3 text-xs leading-5 text-muted-foreground">
+        En celular, «Abrir visor completo» ofrece una lectura más cómoda. Documento original disponible en BVS MINSA.
+      </p>
+    </details>
+  ) : (
+    <div class="mt-5 flex items-start gap-3 rounded-xl border border-dashed border-warning/40 bg-warning/5 p-5 text-sm leading-7">
+      <AlertCircle className="size-5 text-warning shrink-0 mt-1" aria-hidden="true" />
+      <div>
+        <p class="font-bold text-foreground">La vista previa no está disponible todavía.</p>
+        <p class="mt-1 text-muted-foreground">
+          Para evitar mostrar un recuadro vacío, solo habilitamos el visor cuando existe una copia local del PDF. Mientras tanto, utiliza «Documento original en BVS».
+        </p>
+      </div>
+    </div>
+  )}
+</section>

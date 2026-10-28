@@ -1,0 +1,235 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import OfficialPdf from '@/components/astro/OfficialPdf.astro';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import ManualToolkit from '@/components/islands/ManualToolkit';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { urlFor } from '@/lib/urls';
+import { codes } from '@/data/codes';
+import {
+  Home,
+  BookOpen,
+  Calendar,
+  Layers,
+  CheckCircle2,
+  Clock,
+  History,
+  FileText,
+  ClipboardCheck,
+  AlertTriangle,
+  AlertCircle,
+  ListOrdered,
+  CheckSquare,
+  ArrowUpRight,
+  Sparkles
+} from 'lucide-react';
+
+export async function getStaticPaths(){
+  const entries=await getCollection('manuales');
+  return entries.map(entry=>({params:{slug:entry.id},props:{entry}}));
+}
+
+interface Props {entry:CollectionEntry<'manuales'>}
+const {entry}=Astro.props;
+const {Content}=await render(entry);
+const m=entry.data;
+const relatedCodes=codes.filter(c=>c.manual===entry.id);
+const all=await getCollection('manuales');
+const related=all.filter(e=>e.id!==entry.id&&e.data.category===m.category).slice(0,3);
+const title=`${m.shortTitle} · Manual HIS`;
+// Solo se incrusta un PDF real, válido y publicado bajo el propio dominio.
+const pdfPath=join(process.cwd(),'public','pdfs',`${entry.id}.pdf`);
+const localAvailable=Boolean(m.pdf&&existsSync(pdfPath));
+const historical=Boolean(m.year && m.year<2023);
+---
+<SiteLayout title={title} description={m.description}>
+  <section class="border-b border-border bg-card/70">
+    <div class="container-site py-10 sm:py-14">
+      <nav aria-label="Ruta de navegación" class="flex items-center text-xs font-semibold text-muted-foreground">
+        <a class="inline-flex items-center gap-1 hover:text-primary transition-colors" href={urlFor('')}>
+          <Home className="size-3.5 shrink-0" aria-hidden="true" />
+          <span>Inicio</span>
+        </a>
+        <span class="mx-2">/</span>
+        <a class="hover:text-primary transition-colors" href={urlFor('manuales/')}>Manuales</a>
+        <span class="mx-2">/</span>
+        <span class="text-foreground truncate max-w-xs">{m.shortTitle}</span>
+      </nav>
+
+      <div class="mt-6 flex flex-wrap items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-bold text-primary">
+          <Layers className="size-3 shrink-0" aria-hidden="true" />
+          <span>{m.category}</span>
+        </span>
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-xs font-semibold text-muted-foreground">
+          <Calendar className="size-3 shrink-0" aria-hidden="true" />
+          <span>{m.year || 'Año pendiente de validar'}</span>
+        </span>
+        {historical && (
+          <span class="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-700 dark:text-amber-300">
+            <History className="size-3 shrink-0" aria-hidden="true" />
+            <span>Edición histórica</span>
+          </span>
+        )}
+        <span class:list={[
+          'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold',
+          m.status==='verificado'?'border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-400/30 dark:bg-emerald-950/40 dark:text-emerald-300':'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-400/30 dark:bg-amber-950/40 dark:text-amber-300'
+        ]}>
+          {m.status==='verificado' ? (
+            <>
+              <CheckCircle2 className="size-3 shrink-0" aria-hidden="true" />
+              <span>PDF oficial identificado</span>
+            </>
+          ) : (
+            <>
+              <Clock className="size-3 shrink-0" aria-hidden="true" />
+              <span>Enlace PDF pendiente</span>
+            </>
+          )}
+        </span>
+      </div>
+
+      <h1 class="mt-5 max-w-4xl text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">{m.title}</h1>
+      <p class="mt-5 max-w-3xl text-base leading-8 text-muted-foreground">{m.description}</p>
+
+      <div class="mt-7 flex flex-wrap gap-3">
+        <a
+          href={localAvailable ? '#pdf' : (m.pdf || m.source)}
+          target={localAvailable ? undefined : '_blank'}
+          rel={localAvailable ? undefined : 'noopener noreferrer'}
+          class="ui-action inline-flex min-h-12 items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-primary-foreground"
+        >
+          <FileText className="size-4 shrink-0" aria-hidden="true" />
+          <span>{localAvailable ? 'Leer PDF en este sitio ↓' : m.pdf ? 'Abrir PDF oficial ↗' : 'Consultar catálogo BVS ↗'}</span>
+        </a>
+        <a href="#resumen" class="ui-action inline-flex min-h-12 items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-bold hover:bg-surface-hover">
+          <BookOpen className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <span>Leer resumen ↓</span>
+        </a>
+        <a href="#herramientas" class="ui-action inline-flex min-h-12 items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-bold hover:bg-surface-hover">
+          <ClipboardCheck className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <span>Apoyo para digitación ↓</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="container-site grid gap-9 py-10 lg:grid-cols-[minmax(0,1fr)_285px] lg:gap-12 lg:py-14">
+    <div class="min-w-0 space-y-10">
+      {historical && (
+        <div class="flex items-start gap-3 rounded-xl border border-amber-300/50 bg-amber-50 p-4 text-sm leading-6 text-amber-950 dark:border-amber-400/30 dark:bg-amber-950/35 dark:text-amber-100">
+          <AlertTriangle className="size-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <div>
+            <strong>Edición histórica de {m.year}.</strong> Este documento se conserva para consulta y trazabilidad. Confirma las normas y manuales vigentes antes de utilizar sus códigos en un registro actual.
+          </div>
+        </div>
+      )}
+
+      <section id="resumen" class="rounded-2xl border border-border bg-card px-6 py-7 shadow-sm sm:px-9">
+        <div class="eyebrow flex items-center gap-2">
+          <BookOpen className="size-3.5 text-primary shrink-0" aria-hidden="true" />
+          <span>Contenido del documento</span>
+        </div>
+        <h2 class="mt-2 text-2xl font-extrabold">Resumen ejecutivo y secciones clave</h2>
+        <div class="prose-his mt-5">
+          <Content />
+        </div>
+      </section>
+
+      <section id="herramientas">
+        <div class="eyebrow flex items-center gap-2">
+          <ClipboardCheck className="size-3.5 text-primary shrink-0" aria-hidden="true" />
+          <span>Uso operativo</span>
+        </div>
+        <h2 class="mb-5 mt-2 text-2xl font-extrabold">Herramientas de consulta rápida</h2>
+        <ManualToolkit client:visible tips={m.digitizerTips} codes={relatedCodes} pdf={m.pdf} base={urlFor('')} />
+      </section>
+
+      {m.pdf && <OfficialPdf shortTitle={m.shortTitle} pdf={m.pdf} slug={entry.id} localAvailable={localAvailable} />}
+
+      {m.status==='pendiente' && (
+        <section class="flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm leading-relaxed text-amber-950 dark:border-amber-400/30 dark:bg-amber-950/40 dark:text-amber-100">
+          <AlertCircle className="size-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <div>
+            <strong>Ficha pendiente de validación documental.</strong> No se ha identificado un PDF específico y una edición confirmada. La ficha es útil para navegar por tema, pero no contiene instrucciones operativas verificadas.
+          </div>
+        </section>
+      )}
+    </div>
+
+    <aside class="space-y-5 lg:sticky lg:top-28 lg:self-start">
+      <div class="rounded-2xl border border-border bg-card p-5">
+        <div class="flex items-center gap-2 text-sm font-extrabold">
+          <FileText className="size-4 text-primary shrink-0" aria-hidden="true" />
+          <span>Ficha del manual</span>
+        </div>
+        <dl class="mt-5 space-y-4 text-sm">
+          <div>
+            <dt class="text-xs text-muted-foreground">Programa</dt>
+            <dd class="mt-1 font-bold">{m.program}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted-foreground">Edición / año</dt>
+            <dd class="mt-1 font-bold">{m.year || 'Sin confirmar'}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted-foreground">Tipo</dt>
+            <dd class="mt-1 font-bold">{m.type}</dd>
+          </div>
+          <div>
+            <dt class="text-xs text-muted-foreground">Fuente</dt>
+            <dd class="mt-1 font-bold">Ministerio de Salud del Perú</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="rounded-2xl border border-border bg-card p-5">
+        <div class="mb-4 flex items-center gap-2 text-sm font-extrabold">
+          <ListOrdered className="size-4 text-primary shrink-0" aria-hidden="true" />
+          <span>En esta página</span>
+        </div>
+        <nav aria-label="Índice de la ficha" class="space-y-3 text-sm text-muted-foreground">
+          <a class="block hover:text-primary transition-colors" href="#resumen">01 · Resumen y secciones</a>
+          <a class="block hover:text-primary transition-colors" href="#herramientas">02 · Herramientas para digitación</a>
+          {m.pdf && <a class="block hover:text-primary transition-colors" href="#pdf">03 · Documento oficial</a>}
+        </nav>
+      </div>
+
+      <div class="rounded-2xl bg-accent p-5">
+        <div class="flex items-center gap-2 text-sm font-extrabold">
+          <CheckSquare className="size-4 text-primary shrink-0" aria-hidden="true" />
+          <span>¿Debes validar un registro?</span>
+        </div>
+        <p class="mt-2 text-xs leading-6 text-muted-foreground">Contrasta códigos, condición del paciente y LAB con el manual vigente antes de cerrar observaciones.</p>
+        <a href={urlFor('puntos-digitacion/')} class="mt-4 inline-flex items-center gap-1 text-sm font-bold text-primary underline">
+          <span>Ver checklist</span>
+          <ArrowUpRight className="size-3.5" aria-hidden="true" />
+        </a>
+      </div>
+    </aside>
+  </div>
+
+  {related.length>0 && (
+    <section class="border-t border-border bg-card/60">
+      <div class="container-site py-12">
+        <h2 class="mb-5 flex items-center gap-2 text-2xl font-extrabold">
+          <Sparkles className="size-5 text-primary shrink-0" aria-hidden="true" />
+          <span>También puede interesarte</span>
+        </h2>
+        <div class="grid gap-3 md:grid-cols-3">
+          {related.map(e => (
+            <a class="interactive-card rounded-xl border border-border bg-card p-5" href={urlFor(`manuales/${e.id}/`)}>
+              <span class="text-xs font-bold uppercase text-primary">{e.data.program}</span>
+              <div class="mt-2 font-bold">{e.data.shortTitle}</div>
+              <div class="mt-3 flex items-center gap-1 text-sm font-bold text-primary">
+                <span>Abrir ficha</span>
+                <ArrowUpRight className="size-4 shrink-0" aria-hidden="true" />
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</SiteLayout>

@@ -1,0 +1,118 @@
+---
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import { urlFor } from '@/lib/urls';
+import {
+  Printer,
+  Compass,
+  Hash,
+  BookOpen,
+  Info,
+  CheckCircle2,
+  Workflow
+} from 'lucide-react';
+
+const checks = [
+  'Verificar que todas las hojas recibidas estén identificadas con establecimiento, periodo y responsable.',
+  'Comprobar consistencia de fecha de atención, edad, sexo y documento cuando corresponde.',
+  'Confirmar que códigos CIE-10 / CPMS coincidan con la actividad realizada.',
+  'Revisar tipo de diagnóstico P/D/R y valores LAB conforme al manual aplicable.',
+  'Identificar registros incompletos, duplicados y observaciones pendientes de corregir.',
+  'Coordinar correcciones documentadas con el personal asistencial responsable.',
+  'Registrar la conformidad del cierre y conservar evidencia según procedimientos de la Red.',
+];
+---
+<SiteLayout title="Puntos de digitación y control de calidad">
+  <section class="border-b border-border bg-card/70">
+    <div class="container-site py-12">
+      <span class="eyebrow flex items-center gap-1.5">
+        <CheckCircle2 className="size-3.5 text-primary" aria-hidden="true" />
+        <span>OITE · Gestión de la información</span>
+      </span>
+      <h1 class="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Puntos de digitación</h1>
+      <p class="mt-4 max-w-3xl text-sm leading-7 text-muted-foreground">
+        Checklist práctico de control de calidad para el procesamiento de información HIS de las IPRESS. Su aplicación debe ajustarse al cronograma y las directivas vigentes de la Red.
+      </p>
+    </div>
+  </section>
+
+  <div class="container-site grid gap-8 py-12 lg:grid-cols-[1fr_310px]">
+    <section>
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-2xl font-extrabold">Control antes de consolidar</h2>
+        <button id="print-checklist" class="ui-action inline-flex min-h-11 items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-xs font-bold hover:bg-surface-hover">
+          <Printer className="size-4 text-primary shrink-0" aria-hidden="true" />
+          <span>Imprimir checklist</span>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        {checks.map((label, i) => (
+          <label class="interactive-card flex min-h-16 cursor-pointer items-start gap-4 rounded-xl border border-border bg-card p-5 has-[:checked]:border-primary/45 has-[:checked]:bg-accent/35">
+            <input class="mt-1 size-4 accent-teal-700" type="checkbox" />
+            <span class="text-sm leading-6">
+              <strong class="mr-2 text-primary">{String(i + 1).padStart(2, '0')}.</strong>
+              {label}
+            </span>
+          </label>
+        ))}
+      </div>
+      <p class="mt-4 text-xs leading-6 text-muted-foreground">
+        Los checks se marcan únicamente en esta vista del navegador. No se almacenan ni se remiten a ningún servidor.
+      </p>
+
+      <div class="mt-10 rounded-2xl border border-border bg-card p-6">
+        <div class="flex items-center gap-2">
+          <Workflow className="size-5 text-primary shrink-0" aria-hidden="true" />
+          <h2 class="text-xl font-extrabold">Flujo de revisión sugerido</h2>
+        </div>
+        <div class="mt-6 grid gap-3 sm:grid-cols-3">
+          {[
+            { title: 'Recepción', subtitle: 'IPRESS / responsables asistenciales' },
+            { title: 'Control local', subtitle: 'Punto de digitación y responsable' },
+            { title: 'Consolidación', subtitle: 'Validación por equipo OITE / Red' }
+          ].map((s, i) => (
+            <div class="rounded-xl bg-muted p-4">
+              <span class="text-xs font-bold uppercase tracking-widest text-primary">Etapa {i + 1}</span>
+              <div class="mt-2 font-bold">{s.title}</div>
+              <p class="mt-1 text-xs text-muted-foreground">{s.subtitle}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <aside class="space-y-4 lg:sticky lg:top-28 lg:self-start">
+      <div class="rounded-2xl border border-border bg-card p-5">
+        <h2 class="font-extrabold flex items-center gap-2">
+          <Compass className="size-4 text-primary" aria-hidden="true" />
+          <span>Accesos de apoyo</span>
+        </h2>
+        <div class="mt-4 space-y-3 text-sm">
+          <a class="flex items-center gap-2 text-primary underline" href={urlFor('guia-his/')}>
+            <Compass className="size-4 shrink-0 opacity-70" aria-hidden="true" />
+            <span>Guía rápida P/D/R y LAB</span>
+          </a>
+          <a class="flex items-center gap-2 text-primary underline" href={urlFor('codigos/')}>
+            <Hash className="size-4 shrink-0 opacity-70" aria-hidden="true" />
+            <span>Búsqueda de códigos</span>
+          </a>
+          <a class="flex items-center gap-2 text-primary underline" href={urlFor('manuales/')}>
+            <BookOpen className="size-4 shrink-0 opacity-70" aria-hidden="true" />
+            <span>Catálogo de manuales</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-accent p-5">
+        <div class="flex items-center gap-2 font-bold text-sm text-foreground">
+          <Info className="size-4 text-primary shrink-0" aria-hidden="true" />
+          <span>Nota institucional</span>
+        </div>
+        <p class="mt-2 text-xs leading-6 text-muted-foreground">
+          El checklist es una ayuda operativa propuesta; no define plazos oficiales ni sustituye los documentos de la Red o de DIRESA Cajamarca.
+        </p>
+      </div>
+    </aside>
+  </div>
+  <script>document.querySelector('#print-checklist')?.addEventListener('click',()=>window.print());</script>
+</SiteLayout>
