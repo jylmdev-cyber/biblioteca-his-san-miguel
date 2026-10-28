@@ -69,6 +69,8 @@ jobs:
 
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Subir artefacto de publicación
         uses: actions/upload-pages-artifact@v3
